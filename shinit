@@ -1,0 +1,35 @@
+#!/bin/sh
+
+SHINIT_ROOT=${SHINIT_ROOT:-/var/libexec/shinit}
+SHINIT_HOME=${SHINIT_HOME:-/var/lib/shinit}
+
+SHINIT_PROVIDERS=${SHINIT_PROVIDERS:-digitalocean}
+
+# shellcheck source=libexec/lib.sh
+. "$SHINIT_ROOT/lib.sh"
+
+if [ -f "$SHINIT_HOME/done" ] ; then
+    # shinit has already been run on this system, and should not be
+    # run again.
+    die "shinit has already been run, exiting..."
+fi
+
+for provider in $SHINIT_PROVIDERS ; do
+    # shellcheck source=libexec/provider/digitalocean
+    . "$SHINIT_ROOT/provider/$provider"
+
+    check && break
+    provider=
+done
+
+# No provider above matched, so something has gone wrong or we're on
+# an strange new cloud.
+[ -z "$provider" ] && die "No provider supplied information"
+
+# Time to set the variables for configuration.
+configure
+
+
+log "$NAME"
+log "$DATA"
+log "$KEYS"
