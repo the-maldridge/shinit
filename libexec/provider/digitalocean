@@ -1,13 +1,13 @@
 #!/bin/sh
 
-_DO_META_ADDR=http://169.254.169.254/metadata/v1/
+_DO_META_ADDR=http://169.254.169.254/metadata/v1
 
 check() {
-    [ -z "$(curl "$_DO_META_ADDR/id")" ] && return 0
+    [ -n "$(curl "$_DO_META_ADDR/id" 2>/dev/null)" ] && return 0
 }
 
 configure() {
-    NAME="$(curl "$_DO_META_ADDR/hostname")"
-    DATA="$(curl "$_DO_META_ADDR/user-data")"
-    KEYS="$(curl "$_DO_META_ADDR/public-keys")"
+    NAME="$(curl "$_DO_META_ADDR/hostname" 2>/dev/null)"
+    DATA="$(curl "$_DO_META_ADDR/user-data" 2>/dev/null)"
+    KEYS="$(curl "$_DO_META_ADDR/public-keys" 2>/dev/null)"
 }
