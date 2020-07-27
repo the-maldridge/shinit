@@ -29,13 +29,12 @@ done
 
 # Time to set the variables for configuration.  If the base
 # information was not fully populated then we need to bail out.
-configure
+load
 confirm_base_info || die "Base information was not set"
-log "Configured from provider: $provider"
+log "Loaded from provider: $provider"
 
 configure_hostname
 configure_keys
-
 
 # Initialization tasks should generally only be run once, so we set a
 # magic flag to prevent re-running.

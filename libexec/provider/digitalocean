@@ -3,11 +3,11 @@
 _DO_META_ADDR=http://169.254.169.254/metadata/v1
 
 check() {
-    [ -n "$(curl "$_DO_META_ADDR/id" 2>/dev/null)" ] && return 0
+    [ -n "$(fetch_url "$_DO_META_ADDR/id" 2>/dev/null)" ] && return 0
 }
 
-configure() {
-    NAME="$(curl "$_DO_META_ADDR/hostname" 2>/dev/null)"
-    DATA="$(curl "$_DO_META_ADDR/user-data" 2>/dev/null)"
-    KEYS="$(curl "$_DO_META_ADDR/public-keys" 2>/dev/null)"
+load() {
+    NAME="$(fetch_url "$_DO_META_ADDR/hostname" 2>/dev/null)"
+    DATA="$(fetch_url "$_DO_META_ADDR/user-data" 2>/dev/null)"
+    KEYS="$(fetch_url "$_DO_META_ADDR/public-keys" 2>/dev/null)"
 }

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+SHINIT_FETCH_CMD="curl -s"
+
 log() {
     printf >&2 "%s\n" "$1"
 }
@@ -52,4 +54,8 @@ configure_keys() {
     chown -R "$_user:$_group" "$_ssh_dir"
 
     printf >"$_keys_file" "%s\n" "$KEYS"
+}
+
+fetch_url() {
+    $SHINIT_FETCH_CMD "$1"
 }
