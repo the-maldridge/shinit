@@ -2,25 +2,32 @@
 
 SHINIT_ROOT=${SHINIT_ROOT:-/usr/libexec/shinit}
 SHINIT_HOME=${SHINIT_HOME:-/var/lib/shinit}
+SHINIT_STARTWAIT=${SHINIT_STARTWAIT:-0}
+SHINIT_BACKOFF=${SHINIT_BACKOFF:-10}
 
 # shellcheck source=libexec/lib.sh
 . "$SHINIT_ROOT/lib.sh"
 
 [ -f "$SHINIT_HOME/done" ] && die "shinit has already been run, exiting..."
 
-for provider in "$SHINIT_ROOT"/provider/*; do
-    # shellcheck source=libexec/provider/digitalocean
-    . "$provider"
-    provider=${provider##*/}
+sleep -- "$SHINIT_STARTWAIT"
 
-    log "Trying provider: $provider"
-    check && break
-    provider=
+for attempt in 1 2 3 ; do
+    for provider in "$SHINIT_ROOT"/provider/*; do
+        # shellcheck source=libexec/provider/digitalocean
+        . "$provider"
+        provider=${provider##*/}
+
+        log "Trying provider: $provider"
+        check && break 2
+        provider=
+    done
+    sleep -- "$SHINIT_BACKOFF"
 done
 
 # No provider above matched, so something has gone wrong or we're on
 # an strange new cloud.
-[ -z "$provider" ] && die "No provider supplied information"
+[ $attempt -eq 3 ] && [ -z "$provider" ] && die "No provider supplied information"
 
 # Time to set the variables for configuration.  If the base
 # information was not fully populated then we need to bail out.
