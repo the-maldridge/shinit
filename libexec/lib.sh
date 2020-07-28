@@ -1,39 +1,32 @@
 #!/bin/sh
 
-SHINIT_FETCH_CMD="curl -s"
-
 log() {
-    printf >&2 "%s\n" "$1"
+    printf >&2 '%s\n' "$1"
 }
 
 die() {
     log "$1"
-    touch "$SHINIT_HOME/done"
+    touch -- "$SHINIT_HOME/done"
     exit 1
 }
 
 confirm_base_info() {
-    if [ -n "$NAME" ] && [ -n "$DATA" ] && [ -n "$KEYS" ]; then
-        return 1
-    else
-        return 0
-    fi
+    [ -n "$NAME" ] && [ -n "$KEYS" ]
 }
 
 configure_hostname() {
     log "Configuring Hostname"
-    printf >/etc/hostname "%s" "$NAME"
-    hostname "$NAME"
-    printf >>/etc/hosts "\n127.0.0.1\t%s\n" "$NAME"
+    printf >/etc/hostname '%s\n' "$NAME"
+    hostname -- "$NAME"
+    printf >>/etc/hosts '\n127.0.0.1\t%s\n' "$NAME"
 }
 
 configure_keys() {
     log "Configuring SSH keys"
-    if [ -z "$SHINIT_USER" ] ; then
-        log "SHINIT_USER is not set, cannot configure keys"
+    if [ -z "$SHINIT_USER" ]; then
+        log "SHINIT_USER is not set; cannot configure keys"
         return
     fi
-
 
     # This patten is heavily inspired by mcrute's tiny-ec2-bootstrap
     # for Alpine Linux.
@@ -44,8 +37,8 @@ configure_keys() {
 
     if [ ! -d "$_ssh_dir" ]; then
         mkdir -p "$_ssh_dir"
-        chmod 755 "$_ssh_dir"
     fi
+    chmod 755 "$_ssh_dir"
 
     [ -f "$_keys_file" ] && rm "$_keys_file"
 
@@ -53,9 +46,9 @@ configure_keys() {
     chmod 600 "$_keys_file"
     chown -R "$_user:$_group" "$_ssh_dir"
 
-    printf >"$_keys_file" "%s\n" "$KEYS"
+    printf >"$_keys_file" '%s\n' "$KEYS"
 }
 
 fetch_url() {
-    $SHINIT_FETCH_CMD "$1"
+    curl -s -- "$1"
 }

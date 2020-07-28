@@ -1,22 +1,17 @@
 #!/bin/sh
 
-SHINIT_ROOT=${SHINIT_ROOT:-/var/libexec/shinit}
+SHINIT_ROOT=${SHINIT_ROOT:-/usr/libexec/shinit}
 SHINIT_HOME=${SHINIT_HOME:-/var/lib/shinit}
-
-SHINIT_PROVIDERS=${SHINIT_PROVIDERS:-digitalocean}
 
 # shellcheck source=libexec/lib.sh
 . "$SHINIT_ROOT/lib.sh"
 
-if [ -f "$SHINIT_HOME/done" ] ; then
-    # shinit has already been run on this system, and should not be
-    # run again.
-    die "shinit has already been run, exiting..."
-fi
+[ -f "$SHINIT_HOME/done" ] && die "shinit has already been run, exiting..."
 
-for provider in $SHINIT_PROVIDERS ; do
+for provider in "$SHINIT_ROOT"/provider/*; do
     # shellcheck source=libexec/provider/digitalocean
-    . "$SHINIT_ROOT/provider/$provider"
+    . "$provider"
+    provider=${provider##*/}
 
     log "Trying provider: $provider"
     check && break
@@ -38,4 +33,4 @@ configure_keys
 
 # Initialization tasks should generally only be run once, so we set a
 # magic flag to prevent re-running.
-touch "$SHINIT_ROOT/done"
+touch -- "$SHINIT_ROOT/done"
