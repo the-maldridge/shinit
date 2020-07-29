@@ -54,6 +54,21 @@ configure_keys() {
     printf >"$_keys_file" '%s\n' "$KEYS"
 }
 
+process_user_data() {
+    if [ -z "$DATA" ]; then
+        log "No user-data was provided"
+        return
+    fi
+
+    printf >"$SHINIT_HOME"/user-data '%s\n' "$DATA"
+
+    if [ "${DATA%"${DATA#???}"}" = "#!/" ]; then
+        chmod +x -- "$SHINIT_HOME"/user-data
+        log "user-data appears to be a script, executing..."
+        "$SHINIT_HOME"/user-data
+    fi
+}
+
 fetch_url() {
     curl -s -- "$1"
 }

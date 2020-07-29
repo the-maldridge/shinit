@@ -37,6 +37,10 @@ log "Loaded from provider: $provider"
 configure_hostname
 configure_keys
 
+# This is done after everything else is configured, just before
+# exiting.
+process_user_data
+
 # Initialization tasks should generally only be run once, so we set a
 # magic flag to prevent re-running.
 touch -- "$SHINIT_ROOT/done"
