@@ -10,11 +10,12 @@ die() {
     exit 1
 }
 
-confirm_base_info() {
-    [ -n "$NAME" ] && [ -n "$KEYS" ]
-}
-
 configure_hostname() {
+    if [ -z "$NAME" ]; then
+        log "Could not set hostname"
+        return
+    fi
+
     log "Configuring Hostname"
     printf >/etc/hostname '%s\n' "$NAME"
     hostname -- "$NAME"
@@ -22,11 +23,15 @@ configure_hostname() {
 }
 
 configure_keys() {
-    log "Configuring SSH keys"
+    if [ -z "$KEYS" ]; then
+        log "No keys to set!"
+        return
+    fi
     if [ -z "$SHINIT_USER" ]; then
         log "SHINIT_USER is not set; cannot configure keys"
         return
     fi
+    log "Configuring SSH keys"
 
     # This patten is heavily inspired by mcrute's tiny-ec2-bootstrap
     # for Alpine Linux.

@@ -32,7 +32,6 @@ done
 # Time to set the variables for configuration.  If the base
 # information was not fully populated then we need to bail out.
 load
-confirm_base_info || die "Base information was not set"
 log "Loaded from provider: $provider"
 
 configure_hostname
