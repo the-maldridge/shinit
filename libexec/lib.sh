@@ -70,5 +70,6 @@ process_user_data() {
 }
 
 fetch_url() {
-    curl -s -- "$1"
+    curl -sf -- "$1"
+    return $?
 }

@@ -1,0 +1,21 @@
+#!/bin/sh
+
+_AWS_META_ADDR=http://169.254.169.254/latest
+
+_imds_fetch() {
+    curl -sf -H "X-aws-ec2-metadata-token: $_TOKEN" $_AWS_META_ADDR/"$1"
+}
+
+check() {
+    _TOKEN=$(curl -s -X PUT "$_AWS_META_ADDR/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 2")
+    [ -z "$_TOKEN" ] && return 1
+    _imds_fetch "meta-data/ami-id" >/dev/null
+    return $?
+}
+
+load() {
+    _TOKEN=$(curl -sf -X PUT "$_AWS_META_ADDR/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 2")
+    NAME="$(_imds_fetch "meta-data/hostname")"
+    KEYS="$(_imds_fetch "meta-data/public-keys/0/openssh-key")"
+    DATA="$(_imds_fetch "user-data")"
+}

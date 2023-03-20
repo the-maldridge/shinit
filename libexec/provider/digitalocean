@@ -3,7 +3,8 @@
 _DO_META_ADDR=http://169.254.169.254/metadata/v1
 
 check() {
-    [ -n "$(fetch_url "$_DO_META_ADDR/id")" ]
+    fetch_url "$_DO_META_ADDR/id"
+    return $?
 }
 
 load() {
